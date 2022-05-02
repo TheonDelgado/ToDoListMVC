@@ -1,11 +1,11 @@
-@model ToDoModel
+@model ToDoViewModel
 
 <form asp-action="Insert" id="form-action" method="post" role="form">
     <div asp-validation-summary="All"></div>
-        <label asp-for="Name"></label>
-        <input asp-for="Id" type="hidden"/>
-        <input asp-for="Name"/>
-        <span asp-validation-for="Name"></span>
+        <label asp-for="ToDo.Name"></label>
+        <input asp-for="ToDo.Id" type="hidden"/>
+        <input asp-for="ToDo.Name"/>
+        <span asp-validation-for="ToDo.Name"></span>
         <input type="submit" id="form-button" value="Add ToDo"/>
 </form>
 

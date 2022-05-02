@@ -17,7 +17,50 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var todoListViewModel = GetAllToDos();
+        return View(todoListViewModel);
+    }
+
+    internal ToDoViewModel GetAllToDos()
+    {
+        List<ToDoModel> todoList = new List<ToDoModel>();
+
+        using(SqliteConnection connection = new SqliteConnection(_configuration.GetConnectionString("ConnectionString")))
+        {
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @$"SELECT * FROM ToDo";
+            
+            using(var reader = command.ExecuteReader())
+            {
+                if(reader.HasRows)
+                {
+                    while(reader.Read())
+                    {
+                        todoList.Add(
+                            new ToDoModel 
+                            {
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1)
+                            }
+                        );
+                    }
+                }
+                else 
+                {
+                    return new ToDoViewModel 
+                    {
+                        ToDoList = todoList
+                    };
+                }
+            }
+
+
+        }
+        return new ToDoViewModel
+        {
+            ToDoList = todoList
+        };
     }
 
     public RedirectResult Insert(ToDoModel todo)
