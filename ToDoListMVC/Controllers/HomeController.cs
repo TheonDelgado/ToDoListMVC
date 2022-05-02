@@ -75,4 +75,18 @@ public class HomeController : Controller
         }
         return Redirect("https://localhost:7017");
     }
+
+    [HttpPost]
+    public JsonResult Delete(int id) 
+    {
+        using(SqliteConnection connection = new SqliteConnection(_configuration.GetConnectionString("ConnectionString")))
+        {
+            connection.Open();
+            var command = connection.CreateCommand();
+            command.CommandText = @$"DELETE from ToDo
+                                    WHERE Id = '{id}';";
+            command.ExecuteNonQuery();
+        }
+        return Json(new{});
+    }
 }
