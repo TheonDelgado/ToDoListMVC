@@ -54,8 +54,6 @@ public class HomeController : Controller
                     };
                 }
             }
-
-
         }
         return new ToDoViewModel
         {
@@ -89,4 +87,67 @@ public class HomeController : Controller
         }
         return Json(new{});
     }
+
+    public JsonResult PopulateForm(int id) 
+    {
+        var todo = GetById(id);
+        return Json(todo);
+    }
+
+     internal ToDoModel GetById(int id)
+        {
+            ToDoModel todo = new();
+
+            using (var connection = new SqliteConnection(_configuration.GetConnectionString("ConnectionString")))
+            {
+                using (var tableCmd = connection.CreateCommand())
+                {
+                    connection.Open();
+                    tableCmd.CommandText = $"SELECT * FROM todo Where Id = '{id}'";
+
+                    using (var reader = tableCmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            reader.Read();
+                            todo.Id = reader.GetInt32(0);
+                            todo.Name = reader.GetString(1);
+                        }
+                        else
+                        {
+                            return todo;   
+                        }
+                    };
+                }
+            }
+
+            return todo;
+        }
+
+     public RedirectResult Update(ToDoModel todo)
+        {
+            using (SqliteConnection con = new SqliteConnection(_configuration.GetConnectionString("ConnectionString")))
+            {
+                using (var tableCmd = con.CreateCommand())
+                {
+                    con.Open();
+                    tableCmd.CommandText = $"UPDATE todo SET name = '{todo.Name}' WHERE Id = '{todo.Id}';";
+                    try
+                    {
+                        tableCmd.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+
+            return Redirect("https://localhost:7017/");
+        }
+
+        public void ResetIndex(ToDoModel todo) 
+        {
+            
+        }
 }
